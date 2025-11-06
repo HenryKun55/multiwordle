@@ -18,6 +18,9 @@ npm run test:load:10
 # Teste médio com 100 jogadores (45s)
 npm run test:load:100
 
+# Teste moderado com 150 jogadores (60s) - RECOMENDADO
+npm run test:load:150
+
 # Teste pesado com 500 jogadores (60s)
 npm run test:load:500
 
@@ -28,9 +31,18 @@ npm run test:load:1000
 ### Teste em Produção (após deploy)
 
 ```bash
-# Substitua pela sua URL do Railway/Render
-SERVER_URL=https://sua-url.railway.app npm run test:load:1000
+# Teste recomendado com 150 jogadores no servidor de produção
+npm run test:load:prod
+
+# OU customize a URL
+SERVER_URL=https://multiwordle.onrender.com NUM_PLAYERS=150 DELAY=50 node tests/load-test.js
 ```
+
+**Configurações do teste em produção:**
+- **150 jogadores simultâneos** (30% da capacidade máxima de 500)
+- **50ms de delay** entre conexões (evita rate limiting)
+- **90 segundos de duração** (tempo suficiente para testar estabilidade)
+- Simula uso realista do servidor
 
 ---
 
