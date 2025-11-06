@@ -251,7 +251,7 @@ function GameContent() {
 
             {serverFull && (
               <div className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 px-4 py-3 rounded-lg">
-                Servidor cheio! Tente novamente em alguns minutos. Limite: 500 jogadores simultâneos.
+                Servidor cheio! Tente novamente em alguns minutos. Limite: 100 jogadores simultâneos.
               </div>
             )}
 

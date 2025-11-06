@@ -25,7 +25,7 @@ const RATE_LIMIT_MAX = 100; // 100 ações por minuto
 const MAX_PLAYERS_PER_ROOM = 1000;
 
 // Limite GLOBAL de conexões simultâneas (para não derrubar o servidor)
-const MAX_GLOBAL_CONNECTIONS = 500;
+const MAX_GLOBAL_CONNECTIONS = 100;
 let activeConnections = 0;
 
 // Limpeza automática de salas antigas (1 hora de inatividade)

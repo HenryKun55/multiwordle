@@ -9,11 +9,10 @@
     "lint": "next lint",
     "test:load": "node tests/load-test.js",
     "test:load:10": "NUM_PLAYERS=10 DURATION=30000 node tests/load-test.js",
-    "test:load:100": "NUM_PLAYERS=100 DURATION=45000 node tests/load-test.js",
-    "test:load:150": "NUM_PLAYERS=150 DELAY=50 DURATION=60000 node tests/load-test.js",
-    "test:load:500": "NUM_PLAYERS=500 DURATION=60000 node tests/load-test.js",
-    "test:load:1000": "NUM_PLAYERS=1000 DURATION=60000 node tests/load-test.js",
-    "test:load:prod": "SERVER_URL=https://multiwordle.onrender.com NUM_PLAYERS=150 DELAY=50 DURATION=90000 node tests/load-test.js"
+    "test:load:50": "NUM_PLAYERS=50 DELAY=50 DURATION=45000 node tests/load-test.js",
+    "test:load:80": "NUM_PLAYERS=80 DELAY=50 DURATION=60000 node tests/load-test.js",
+    "test:load:100": "NUM_PLAYERS=100 DELAY=100 DURATION=60000 node tests/load-test.js",
+    "test:load:prod": "SERVER_URL=https://multiwordle.onrender.com NUM_PLAYERS=80 DELAY=100 DURATION=90000 node tests/load-test.js"
   },
   "dependencies": {
     "next": "15.0.2",
