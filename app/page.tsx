@@ -105,6 +105,22 @@ function GameContent() {
     };
   }, [socket, setCurrentPlayerId, setGameState, updatePlayer]);
 
+  // Gerar ID de sala aleatório
+  const generateRoomId = () => {
+    const adjectives = ['rapido', 'legal', 'super', 'mega', 'ultra', 'top'];
+    const nouns = ['jogo', 'sala', 'time', 'grupo', 'turma', 'galera'];
+    const randomNum = Math.floor(Math.random() * 1000);
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    return `${adj}-${noun}-${randomNum}`;
+  };
+
+  // Criar nova sala
+  const handleCreateRoom = () => {
+    const newRoomId = generateRoomId();
+    setRoomId(newRoomId);
+  };
+
   // Entrar na sala
   const handleJoinRoom = (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,19 +183,31 @@ function GameContent() {
 
           <form onSubmit={handleJoinRoom} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                ID da Sala
-              </label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  ID da Sala
+                </label>
+                <button
+                  type="button"
+                  onClick={handleCreateRoom}
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  Criar Sala Nova
+                </button>
+              </div>
               <input
                 type="text"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
-                placeholder="Digite o ID da sala"
+                placeholder="Ex: rapido-jogo-123"
                 className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 required
                 minLength={3}
                 maxLength={30}
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Compartilhe este ID com seus amigos para jogarem juntos
+              </p>
             </div>
 
             <div>
