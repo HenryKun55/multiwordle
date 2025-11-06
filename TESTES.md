@@ -28,22 +28,23 @@ npm run test:load:100
 ### Teste em Produção (após deploy)
 
 ```bash
-# Teste recomendado com 80 jogadores no servidor de produção
+# Teste COMPLETO com 100 jogadores no servidor de produção
 npm run test:load:prod
 
 # OU customize a URL
-SERVER_URL=https://multiwordle.onrender.com NUM_PLAYERS=80 DELAY=100 node tests/load-test.js
+SERVER_URL=https://multiwordle.onrender.com NUM_PLAYERS=100 DELAY=100 node tests/load-test.js
 ```
 
 **Configurações do teste em produção:**
-- **80 jogadores simultâneos** (80% da capacidade máxima de 100)
+- **100 jogadores simultâneos** (100% da capacidade máxima)
 - **100ms de delay** entre conexões (evita rate limiting)
 - **90 segundos de duração** (tempo suficiente para testar estabilidade)
-- Simula uso realista do servidor free tier
+- Testa capacidade MÁXIMA do servidor free tier
 
 **⚠️ LIMITE DO SERVIDOR: 100 conexões simultâneas**
 - Protege o servidor free tier do Render
 - Previne quedas por sobrecarga
+- Todos os 100 jogadores devem conectar com sucesso
 - Jogador 101 receberá mensagem "Servidor cheio"
 
 ---
