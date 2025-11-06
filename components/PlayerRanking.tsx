@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Player } from '@/types/game';
 import { calculateProgress, comparePlayerProgress } from '@/lib/game-logic';
 
@@ -11,6 +11,9 @@ interface PlayerRankingProps {
 }
 
 export default function PlayerRanking({ players, currentPlayerId, winner }: PlayerRankingProps) {
+  const [showAll, setShowAll] = useState(false);
+  const INITIAL_DISPLAY = 10;
+
   // Ordenar jogadores por ranking
   const rankedPlayers = useMemo(() => {
     return [...players]
@@ -26,6 +29,14 @@ export default function PlayerRanking({ players, currentPlayerId, winner }: Play
       );
   }, [players]);
 
+  // Jogadores para exibir
+  const displayedPlayers = showAll ? rankedPlayers : rankedPlayers.slice(0, INITIAL_DISPLAY);
+  const hasMore = rankedPlayers.length > INITIAL_DISPLAY;
+  const hiddenCount = rankedPlayers.length - INITIAL_DISPLAY;
+
+  // Encontrar posição do jogador atual
+  const currentPlayerPosition = rankedPlayers.findIndex(p => p.id === currentPlayerId) + 1;
+
   if (players.length === 0) {
     return (
       <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-full flex items-center justify-center">
@@ -35,16 +46,26 @@ export default function PlayerRanking({ players, currentPlayerId, winner }: Play
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-full overflow-y-auto">
-      <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-        Ranking ({players.length} jogador{players.length !== 1 ? 'es' : ''})
-      </h2>
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-full flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          Ranking
+        </h2>
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {players.length} jogador{players.length !== 1 ? 'es' : ''}
+          {currentPlayerPosition > 0 && (
+            <span className="ml-2 font-semibold text-blue-600 dark:text-blue-400">
+              #{currentPlayerPosition}
+            </span>
+          )}
+        </div>
+      </div>
 
-      <div className="space-y-2">
-        {rankedPlayers.map((player, index) => {
+      <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+        {displayedPlayers.map((player, index) => {
           const isCurrentPlayer = player.id === currentPlayerId;
           const isWinner = player.id === winner;
-          const position = index + 1;
+          const position = rankedPlayers.findIndex(p => p.id === player.id) + 1;
 
           return (
             <div
@@ -102,7 +123,7 @@ export default function PlayerRanking({ players, currentPlayerId, winner }: Play
                         </span>
                       )}
                       <span className="text-xs text-gray-600 dark:text-gray-400">
-                        {player.attempts}/{6} tentativas
+                        {player.attempts}/6
                       </span>
                     </div>
 
@@ -129,6 +150,24 @@ export default function PlayerRanking({ players, currentPlayerId, winner }: Play
           );
         })}
       </div>
+
+      {/* Botão para expandir/colapsar */}
+      {hasMore && (
+        <button
+          onClick={() => setShowAll(!showAll)}
+          className="mt-4 w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 text-sm"
+        >
+          {showAll ? (
+            <>
+              Mostrar menos ▲
+            </>
+          ) : (
+            <>
+              Mostrar todos (+{hiddenCount}) ▼
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 }
