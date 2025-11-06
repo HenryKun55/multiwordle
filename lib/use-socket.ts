@@ -6,8 +6,52 @@ type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 let socket: TypedSocket | null = null;
 
+// Salvar dados da sessão no localStorage para reconexão
+const SESSION_STORAGE_KEY = 'multiwordle_session';
+
+interface SessionData {
+  socketId: string;
+  roomId: string;
+  playerName: string;
+  timestamp: number;
+}
+
+function saveSession(socketId: string, roomId: string, playerName: string) {
+  const session: SessionData = {
+    socketId,
+    roomId,
+    playerName,
+    timestamp: Date.now(),
+  };
+  localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+}
+
+function getSession(): SessionData | null {
+  try {
+    const data = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (!data) return null;
+
+    const session: SessionData = JSON.parse(data);
+
+    // Sessão expira após 5 minutos
+    if (Date.now() - session.timestamp > 5 * 60 * 1000) {
+      clearSession();
+      return null;
+    }
+
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+function clearSession() {
+  localStorage.removeItem(SESSION_STORAGE_KEY);
+}
+
 export function useSocket() {
   const [isConnected, setIsConnected] = useState(false);
+  const [serverFull, setServerFull] = useState(false);
 
   useEffect(() => {
     if (!socket) {
@@ -24,6 +68,7 @@ export function useSocket() {
       socket.on('connect', () => {
         console.log('Socket conectado:', socket?.id);
         setIsConnected(true);
+        setServerFull(false);
       });
 
       socket.on('disconnect', () => {
@@ -33,6 +78,12 @@ export function useSocket() {
 
       socket.on('connect_error', (error) => {
         console.error('Erro de conexão:', error);
+        setIsConnected(false);
+      });
+
+      socket.on('server:full', ({ message, currentConnections, maxConnections }) => {
+        console.warn('Servidor cheio:', message);
+        setServerFull(true);
         setIsConnected(false);
       });
     }
@@ -54,10 +105,16 @@ export function useSocket() {
   return {
     socket,
     isConnected,
+    serverFull,
     disconnect,
+    saveSession,
+    getSession,
+    clearSession,
   };
 }
 
 export function getSocket(): TypedSocket | null {
   return socket;
 }
+
+export { saveSession, getSession, clearSession };

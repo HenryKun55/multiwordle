@@ -13,7 +13,7 @@ import { WORD_LENGTH } from '@/lib/game-logic';
 function GameContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { socket, isConnected } = useSocket();
+  const { socket, isConnected, serverFull, saveSession, getSession, clearSession } = useSocket();
 
   // State local
   const [roomId, setRoomId] = useState('');
@@ -121,6 +121,24 @@ function GameContent() {
     setRoomId(newRoomId);
   };
 
+  // Tentar reconectar automaticamente ao carregar
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    const session = getSession();
+    if (session) {
+      console.log('Tentando reconectar com sessão salva...');
+      setRoomId(session.roomId);
+      setPlayerName(session.playerName);
+
+      socket.emit('join:room', {
+        roomId: session.roomId,
+        playerName: session.playerName,
+        reconnectId: session.socketId,
+      });
+    }
+  }, [socket, isConnected, getSession]);
+
   // Entrar na sala
   const handleJoinRoom = (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,6 +148,11 @@ function GameContent() {
       roomId: roomId.trim(),
       playerName: playerName.trim(),
     });
+
+    // Salvar sessão para reconexão
+    if (socket.id) {
+      saveSession(socket.id, roomId.trim(), playerName.trim());
+    }
   };
 
   // Digitar letra
@@ -226,7 +249,13 @@ function GameContent() {
               />
             </div>
 
-            {errorMsg && (
+            {serverFull && (
+              <div className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 px-4 py-3 rounded-lg">
+                Servidor cheio! Tente novamente em alguns minutos. Limite: 500 jogadores simultâneos.
+              </div>
+            )}
+
+            {errorMsg && !serverFull && (
               <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
                 {errorMsg}
               </div>
@@ -234,10 +263,10 @@ function GameContent() {
 
             <button
               type="submit"
-              disabled={!isConnected || !roomId.trim() || !playerName.trim()}
+              disabled={serverFull || !isConnected || !roomId.trim() || !playerName.trim()}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
             >
-              {isConnected ? 'Entrar na Sala' : 'Conectando...'}
+              {serverFull ? 'Servidor Cheio' : isConnected ? 'Entrar na Sala' : 'Conectando...'}
             </button>
           </form>
 

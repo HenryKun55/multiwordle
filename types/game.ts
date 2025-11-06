@@ -37,15 +37,16 @@ export interface GameState {
 }
 
 export interface ClientToServerEvents {
-  'join:room': (data: { roomId: string; playerName: string }) => void;
+  'join:room': (data: { roomId: string; playerName: string; reconnectId?: string }) => void;
   'game:guess': (data: { roomId: string; word: string }) => void;
   'game:letter': (data: { roomId: string; letter: string }) => void;
   'game:backspace': (data: { roomId: string }) => void;
 }
 
 export interface ServerToClientEvents {
-  'room:joined': (data: { playerId: string; gameState: GameState }) => void;
+  'room:joined': (data: { playerId: string; gameState: GameState; reconnected?: boolean }) => void;
   'room:error': (data: { message: string }) => void;
+  'server:full': (data: { message: string; currentConnections: number; maxConnections: number }) => void;
   'game:updated': (data: GameState) => void;
   'game:guess:result': (data: {
     playerId: string;

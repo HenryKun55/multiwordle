@@ -13,6 +13,9 @@ const { isValidWord, getRandomWord } = require('../lib/words');
 // Armazenamento em memória das salas
 const rooms = new Map();
 
+// Armazenamento de sessões de jogadores (para reconexão)
+const playerSessions = new Map();
+
 // Rate limiting por IP
 const rateLimits = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 1 minuto
@@ -21,8 +24,15 @@ const RATE_LIMIT_MAX = 100; // 100 ações por minuto
 // Limite de jogadores por sala
 const MAX_PLAYERS_PER_ROOM = 1000;
 
+// Limite GLOBAL de conexões simultâneas (para não derrubar o servidor)
+const MAX_GLOBAL_CONNECTIONS = 500;
+let activeConnections = 0;
+
 // Limpeza automática de salas antigas (1 hora de inatividade)
 const ROOM_TIMEOUT = 60 * 60 * 1000;
+
+// Tempo máximo para reconexão (5 minutos)
+const RECONNECT_TIMEOUT = 5 * 60 * 1000;
 
 /**
  * Verifica rate limiting
@@ -54,6 +64,29 @@ function getGameState(room) {
     winner: room.winner,
     gameEnded: room.gameEnded,
   };
+}
+
+/**
+ * Salva sessão do jogador para possível reconexão
+ */
+function savePlayerSession(playerId, roomId, playerData) {
+  playerSessions.set(playerId, {
+    roomId,
+    playerData,
+    disconnectedAt: Date.now(),
+  });
+
+  // Remove sessão após timeout de reconexão
+  setTimeout(() => {
+    playerSessions.delete(playerId);
+  }, RECONNECT_TIMEOUT);
+}
+
+/**
+ * Recupera sessão do jogador
+ */
+function getPlayerSession(playerId) {
+  return playerSessions.get(playerId);
 }
 
 /**
@@ -97,10 +130,24 @@ function initializeSocket(httpServer) {
 
   io.on('connection', (socket) => {
     const ip = socket.handshake.address;
-    console.log(`Cliente conectado: ${socket.id} (IP: ${ip})`);
 
-    // Entrar em uma sala
-    socket.on('join:room', ({ roomId, playerName }) => {
+    // Verificar limite global de conexões
+    if (activeConnections >= MAX_GLOBAL_CONNECTIONS) {
+      console.log(`Conexão rejeitada por limite global: ${socket.id}`);
+      socket.emit('server:full', {
+        message: 'Servidor cheio! Tente novamente em alguns minutos.',
+        currentConnections: activeConnections,
+        maxConnections: MAX_GLOBAL_CONNECTIONS,
+      });
+      socket.disconnect(true);
+      return;
+    }
+
+    activeConnections++;
+    console.log(`Cliente conectado: ${socket.id} (IP: ${ip}) - Total: ${activeConnections}/${MAX_GLOBAL_CONNECTIONS}`);
+
+    // Entrar em uma sala (ou reconectar)
+    socket.on('join:room', ({ roomId, playerName, reconnectId }) => {
       try {
         // Rate limiting
         if (!checkRateLimit(ip)) {
@@ -123,6 +170,39 @@ function initializeSocket(httpServer) {
 
         const sanitizedRoomId = sanitizeInput(roomId);
         const sanitizedName = sanitizeInput(playerName);
+
+        // Tentar reconectar com sessão salva
+        if (reconnectId) {
+          const session = getPlayerSession(reconnectId);
+          if (session && session.roomId === sanitizedRoomId) {
+            const room = rooms.get(sanitizedRoomId);
+            if (room) {
+              // Restaurar jogador com novo socket ID
+              const oldPlayerData = session.playerData;
+              const restoredPlayer = {
+                ...oldPlayerData,
+                id: socket.id,
+                lastUpdate: Date.now(),
+              };
+
+              room.players.set(socket.id, restoredPlayer);
+              socket.join(sanitizedRoomId);
+
+              socket.emit('room:joined', {
+                playerId: socket.id,
+                gameState: getGameState(room),
+                reconnected: true,
+              });
+
+              io.to(sanitizedRoomId).emit('game:updated', getGameState(room));
+              console.log(`Jogador ${restoredPlayer.name} reconectado na sala ${sanitizedRoomId}`);
+
+              // Limpar sessão antiga
+              playerSessions.delete(reconnectId);
+              return;
+            }
+          }
+        }
 
         // Criar sala se não existir
         if (!rooms.has(sanitizedRoomId)) {
@@ -352,11 +432,20 @@ function initializeSocket(httpServer) {
 
     // Desconexão
     socket.on('disconnect', () => {
-      console.log(`Cliente desconectado: ${socket.id}`);
+      activeConnections--;
+      console.log(`Cliente desconectado: ${socket.id} - Total: ${activeConnections}/${MAX_GLOBAL_CONNECTIONS}`);
 
-      // Remover jogador de todas as salas
+      // Salvar sessão para possível reconexão
       for (const [roomId, room] of rooms.entries()) {
         if (room.players.has(socket.id)) {
+          const playerData = room.players.get(socket.id);
+
+          // Salvar sessão apenas se o jogo ainda está ativo
+          if (!room.gameEnded && playerData.gameStatus === 'playing') {
+            savePlayerSession(socket.id, roomId, playerData);
+            console.log(`Sessão salva para reconexão: ${playerData.name} (${socket.id})`);
+          }
+
           room.players.delete(socket.id);
 
           // Se a sala ficou vazia, remover após um tempo
