@@ -55,3 +55,8 @@ export const useGameStore = create<GameStore>((set) => ({
 
   reset: () => set(initialState),
 }));
+
+// Expor store globalmente para testes E2E (apenas em desenvolvimento/teste)
+if (typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')) {
+  (window as any).__ZUSTAND_STORE__ = useGameStore;
+}
