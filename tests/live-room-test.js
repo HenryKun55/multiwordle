@@ -2,8 +2,8 @@ const { io } = require('socket.io-client');
 
 // Configurações
 const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000';
-const ROOM_ID = process.env.ROOM_ID || 'salajogo2';
-const NUM_PLAYERS = parseInt(process.env.NUM_PLAYERS || '20');
+const ROOM_ID = process.env.ROOM_ID || 'salajogo';
+const NUM_PLAYERS = parseInt(process.env.NUM_PLAYERS || '100');
 const DELAY_BETWEEN_CONNECTIONS = parseInt(process.env.DELAY || '100');
 
 // Palavras para tentar (mix de válidas e inválidas)
