@@ -88,66 +88,6 @@ multiwordle/
 └── server.js             # Servidor HTTP customizado
 ```
 
-## Deployment Gratuito
-
-### Opção 1: Railway (Recomendado para WebSocket)
-
-Railway oferece 500 horas gratuitas por mês e suporta WebSocket nativamente.
-
-1. Criar conta em [railway.app](https://railway.app)
-2. Conectar seu repositório GitHub
-3. Deploy automático!
-
-**Vantagens:**
-- Suporta WebSocket nativamente
-- 500 horas grátis/mês
-- Escalável até 5000 usuários simultâneos
-- SSL automático
-
-### Opção 2: Render
-
-Render oferece plano gratuito com suporte a WebSocket.
-
-1. Criar conta em [render.com](https://render.com)
-2. Criar novo Web Service
-3. Conectar repositório
-4. Configurar:
-   - Build Command: `npm install && npm run build`
-   - Start Command: `npm start`
-
-**Vantagens:**
-- Plano gratuito permanente
-- Suporta WebSocket
-- SSL automático
-- Até 750 horas grátis/mês
-
-### Opção 3: Fly.io
-
-Fly.io oferece recursos gratuitos generosos.
-
-1. Instalar Fly CLI: `curl -L https://fly.io/install.sh | sh`
-2. Login: `fly auth login`
-3. Criar app: `fly launch`
-4. Deploy: `fly deploy`
-
-**Vantagens:**
-- 3 VMs gratuitas
-- Suporta WebSocket
-- Edge computing (baixa latência)
-- Até 160GB de tráfego grátis/mês
-
-### Opção 4: Vercel + Backend Separado
-
-Para a interface usar Vercel, e para WebSocket usar Railway/Render.
-
-**Frontend (Vercel):**
-1. Fazer deploy no Vercel
-2. Configurar variável `NEXT_PUBLIC_SOCKET_URL` com URL do backend
-
-**Backend (Railway/Render):**
-1. Criar repositório separado apenas com `server/` e `lib/`
-2. Deploy no Railway ou Render
-
 ## Variáveis de Ambiente
 
 ```env
@@ -191,4 +131,4 @@ MIT
 
 ## Autor
 
-Criado com Claude Code
+Criado por Flávio Henrique com Claude Code
