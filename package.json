@@ -12,7 +12,11 @@
     "test:load:50": "NUM_PLAYERS=50 DELAY=50 DURATION=45000 node tests/load-test.js",
     "test:load:80": "NUM_PLAYERS=80 DELAY=50 DURATION=60000 node tests/load-test.js",
     "test:load:100": "NUM_PLAYERS=100 DELAY=100 DURATION=60000 node tests/load-test.js",
-    "test:load:prod": "SERVER_URL=https://multiwordle.onrender.com NUM_PLAYERS=100 DELAY=100 DURATION=90000 node tests/load-test.js"
+    "test:load:prod": "SERVER_URL=https://multiwordle.onrender.com NUM_PLAYERS=100 DELAY=100 DURATION=90000 node tests/load-test.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
     "next": "15.0.2",
@@ -23,7 +27,8 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^20.19.24",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
