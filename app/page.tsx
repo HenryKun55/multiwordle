@@ -304,10 +304,10 @@ function GameContent() {
       </header>
 
       {/* Conteúdo principal */}
-      <main className="max-w-7xl mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={{ height: 'calc(100vh - 120px)' }}>
+      <main className="max-w-7xl mx-auto p-4 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:h-full">
           {/* Área do jogo */}
-          <div className="lg:col-span-2 flex flex-col items-center justify-center gap-6 overflow-y-auto">
+          <div className="lg:col-span-2 flex flex-col items-center justify-center gap-6 min-h-[600px] lg:min-h-0">
             {currentPlayer && (
               <>
                 <GameGrid
@@ -335,7 +335,7 @@ function GameContent() {
           </div>
 
           {/* Ranking */}
-          <div className="lg:col-span-1" style={{ height: 'calc(100vh - 120px)' }}>
+          <div className="lg:col-span-1 h-[500px] lg:h-full">
             <PlayerRanking
               players={players}
               currentPlayerId={currentPlayerId}
