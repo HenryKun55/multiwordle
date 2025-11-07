@@ -46,7 +46,7 @@ export default function PlayerRanking({ players, currentPlayerId, winner }: Play
   }
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-full flex flex-col max-h-full overflow-hidden">
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 flex flex-col overflow-hidden" style={{ height: '100%' }}>
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           Ranking
@@ -61,7 +61,7 @@ export default function PlayerRanking({ players, currentPlayerId, winner }: Play
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-2 pr-1" style={{ minHeight: 0, maxHeight: '100%' }}>
         {displayedPlayers.map((player, index) => {
           const isCurrentPlayer = player.id === currentPlayerId;
           const isWinner = player.id === winner;
