@@ -16,7 +16,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:debug": "playwright test --debug"
+    "test:e2e:debug": "playwright test --debug",
+    "test:live": "ROOM_ID=salajogo NUM_PLAYERS=50 node tests/live-room-test.js",
+    "test:live:prod": "SERVER_URL=https://multiwordle.onrender.com ROOM_ID=salajogo NUM_PLAYERS=50 node tests/live-room-test.js"
   },
   "dependencies": {
     "next": "15.0.2",
