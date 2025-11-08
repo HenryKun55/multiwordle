@@ -22,7 +22,7 @@ const RATE_LIMIT_WINDOW = 60000; // 1 minuto
 const RATE_LIMIT_MAX = 100; // 100 ações por minuto
 
 // Limite de jogadores por sala
-const MAX_PLAYERS_PER_ROOM = 1000;
+const MAX_PLAYERS_PER_ROOM = 50;
 
 // Limite GLOBAL de conexões simultâneas (para não derrubar o servidor)
 const MAX_GLOBAL_CONNECTIONS = 100;
